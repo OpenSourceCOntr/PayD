@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Routes, Route, Outlet, NavLink, useLocation } from "react-router-dom";
 import ConnectAccount from "./components/ConnectAccount";
 import Home from "./pages/Home";
@@ -7,6 +7,7 @@ import PayrollScheduler from "./pages/PayrollScheduler";
 import EmployeeEntry from "./pages/EmployeeEntry";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ErrorFallback from "./components/ErrorFallback";
+import { OnboardingTour } from "./components/OnboardingTour";
 
 // ── Icon components ────────────────────────────────────────────────────────────
 
@@ -43,6 +44,26 @@ const PageWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 
 const AppLayout: React.FC = () => {
     const location = useLocation();
+    const [runTour, setRunTour] = useState(false);
+
+    useEffect(() => {
+        const completed = localStorage.getItem("payd_tour_completed");
+        if (!completed) {
+            setRunTour(true);
+        }
+    }, []);
+
+    const handleTourComplete = () => {
+        setRunTour(false);
+        localStorage.setItem("payd_tour_completed", "true");
+    };
+
+    const restartTour = () => {
+        setRunTour(false);
+        setTimeout(() => {
+            setRunTour(true);
+        }, 100);
+    };
 
     return (
         <div className="app-shell" style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
@@ -58,7 +79,7 @@ const AppLayout: React.FC = () => {
                 gap: "24px"
             }}>
                 {/* Logo */}
-                <NavLink to="/" className="logo-lockup" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none" }}>
+                <NavLink id="tour-logo" to="/" className="logo-lockup" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none" }}>
                     <div className="logo-mark" style={{
                         width: "32px", height: "32px",
                         background: "linear-gradient(135deg, var(--accent), var(--accent2))",
@@ -81,6 +102,7 @@ const AppLayout: React.FC = () => {
                 {/* Nav */}
                 <nav className="app-nav" style={{ display: "flex", alignItems: "center", gap: "4px", marginLeft: "auto" }}>
                     <NavLink
+                        id="tour-payroll"
                         to="/payroll"
                         className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}
                         style={{
@@ -94,6 +116,7 @@ const AppLayout: React.FC = () => {
                     </NavLink>
 
                     <NavLink
+                        id="tour-employees"
                         to="/employee"
                         className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}
                         style={{
@@ -126,6 +149,7 @@ const AppLayout: React.FC = () => {
                 <div className="header-right" style={{ display: "flex", alignItems: "center", gap: "12px", marginLeft: "16px" }}>
                     <ConnectAccount />
                 </div>
+                <OnboardingTour run={runTour} onComplete={handleTourComplete} />
             </header>
 
             {/* ── Content ── */}
@@ -149,7 +173,24 @@ const AppLayout: React.FC = () => {
                         Apache License 2.0
                     </a>
                 </span>
-                <div className="footer-status" style={{ display: "flex", alignItems: "center", gap: "6px", fontFamily: "var(--font-mono)", fontSize: "11px", color: "var(--muted)" }}>
+                <div className="footer-status" style={{ display: "flex", alignItems: "center", gap: "12px", fontFamily: "var(--font-mono)", fontSize: "11px", color: "var(--muted)" }}>
+                    <button
+                        onClick={restartTour}
+                        style={{
+                            background: "none",
+                            border: "none",
+                            color: "var(--accent)",
+                            cursor: "pointer",
+                            fontSize: "11px",
+                            fontWeight: 700,
+                            textTransform: "uppercase",
+                            letterSpacing: "0.05em",
+                            padding: "0"
+                        }}
+                    >
+                        Restart Tour
+                    </button>
+                    <div className="status-sep" style={{ width: "1px", height: "10px", background: "var(--border-hi)" }} />
                     <div className="status-dot" style={{ width: "6px", height: "6px", borderRadius: "50%", background: "var(--accent)", boxShadow: "0 0 6px var(--accent)" }} />
                     STELLAR NETWORK · MAINNET
                 </div>

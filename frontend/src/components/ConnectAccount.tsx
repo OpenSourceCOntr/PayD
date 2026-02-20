@@ -27,6 +27,7 @@ const ConnectAccount: React.FC = () => {
 
     return (
         <button
+            id="tour-connect"
             onClick={() => {
                 void connect();
             }}

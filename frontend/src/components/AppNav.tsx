@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, NavLink } from "react-router-dom";
-import { Code, User, Wallet } from "lucide-react";
+import { Code, User, Wallet, FileText } from "lucide-react";
 import { Avatar } from "./Avatar";
 
 const AppNav: React.FC = () => {
@@ -41,6 +41,21 @@ const AppNav: React.FC = () => {
                     <User className="w-4 h-4" />
                 </span>
                 Employees
+            </NavLink>
+
+            <NavLink
+                to="/reports"
+                className={({ isActive }) =>
+                    `flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-semibold transition ${isActive
+                        ? "text-(--accent) bg-white/5"
+                        : "text-(--muted) hover:bg-white/10 hover:text-white"
+                    }`
+                }
+            >
+                <span className="opacity-70">
+                    <FileText className="w-4 h-4" />
+                </span>
+                Reports
             </NavLink>
 
             <div className="w-px h-5 bg-(--border-hi) mx-2" />

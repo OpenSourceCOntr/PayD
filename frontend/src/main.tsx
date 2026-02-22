@@ -10,6 +10,7 @@ import { SocketProvider } from "./providers/SocketProvider.tsx";
 import * as Sentry from "@sentry/react";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ErrorFallback from "./components/ErrorFallback";
+import { Toaster } from "sonner";
 import "./i18n";
 
 const sentryDsn = import.meta.env.VITE_SENTRY_DSN;
@@ -33,6 +34,17 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <NotificationProvider>
+        <Toaster
+          theme="dark"
+          position="top-right"
+          richColors
+          toastOptions={{
+            style: {
+              background: "var(--surface)",
+              border: "1px solid var(--border)",
+            },
+          }}
+        />
         <SocketProvider>
           <WalletProvider>
             <BrowserRouter>

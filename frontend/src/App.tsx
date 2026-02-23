@@ -104,7 +104,7 @@ function App() {
         <Route
           path="/settings"
           element={
-            <ErrorBoundary Fallback={ErrorFallback}>
+            <ErrorBoundary fallback={<ErrorFallback onReset={() => { }} />}>
               <Settings />
             </ErrorBoundary>
           }
@@ -112,7 +112,7 @@ function App() {
         <Route
           path="/help"
           element={
-            <ErrorBoundary Fallback={ErrorFallback}>
+            <ErrorBoundary fallback={<ErrorFallback onReset={() => { }} />}>
               <HelpCenter />
             </ErrorBoundary>
           }
@@ -120,7 +120,7 @@ function App() {
         <Route
           path="/cross-asset-payment"
           element={
-            <ErrorBoundary Fallback={ErrorFallback}>
+            <ErrorBoundary fallback={<ErrorFallback onReset={() => { }} />}>
               <CrossAssetPayment />
             </ErrorBoundary>
           }

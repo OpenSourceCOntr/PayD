@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-// @ts-expect-error - qrcode.react missing type definitions
 import { QRCodeSVG } from "qrcode.react";
 import { Button } from "@stellar/design-system";
 import { Copy, Key, Eye, BookOpen, ChevronDown, Coins } from "lucide-react";
@@ -192,9 +191,8 @@ export const WalletQRCode: React.FC<WalletQRCodeProps> = ({
                 <span className="font-semibold text-text">{item.title}</span>
                 <ChevronDown
                   size={16}
-                  className={`ml-auto transition-transform ${
-                    expandedStep === item.step ? "rotate-180" : ""
-                  }`}
+                  className={`ml-auto transition-transform ${expandedStep === item.step ? "rotate-180" : ""
+                    }`}
                 />
               </button>
               {expandedStep === item.step && (

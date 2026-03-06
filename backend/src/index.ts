@@ -8,6 +8,7 @@ import v1Routes from './routes/v1';
 import { initializeSocket, emitTransactionUpdate } from './services/socketService';
 import { HealthController } from './controllers/healthController';
 import { ThrottlingService } from './services/throttlingService';
+import { LedgerObserverService } from './services/ledgerObserverService';
 
 const app = express();
 const httpServer = createServer(app);
@@ -97,6 +98,11 @@ const PORT = config.PORT || 3000;
 httpServer.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Environment: ${config.NODE_ENV}`);
+
+  // Start the Ledger Observer Service to listen for Stellar events
+  LedgerObserverService.start().catch(err => {
+    console.error('Failed to start LedgerObserverService:', err);
+  });
 });
 
 export default app;

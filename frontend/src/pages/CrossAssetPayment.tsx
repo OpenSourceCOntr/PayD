@@ -1,5 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Loader2, ArrowRightLeft, ShieldCheck, Info, CheckCircle2, Radio, Wallet } from 'lucide-react';
+import {
+  Loader2,
+  ArrowRightLeft,
+  ShieldCheck,
+  Info,
+  CheckCircle2,
+  Radio,
+  Wallet,
+} from 'lucide-react';
 import { useNotification } from '../hooks/useNotification.js';
 import { useSocket } from '../hooks/useSocket.js';
 import { useWallet } from '../hooks/useWallet.js';
@@ -29,7 +37,7 @@ export default function CrossAssetPayment() {
   const [liveStatusMessage, setLiveStatusMessage] = useState<string>('Waiting for submission...');
   const [status, setStatus] = useState<string>('idle');
 
-  const selectedPath = useMemo(
+  const selectedPath = useMemo<ConversionPath | null>(
     () => paths.find((path) => path.id === selectedPathId) || null,
     [paths, selectedPathId]
   );
@@ -46,7 +54,7 @@ export default function CrossAssetPayment() {
     const timeout = setTimeout(() => {
       void (async () => {
         try {
-          const nextPaths = await fetchConversionPaths({
+          const nextPaths: ConversionPath[] = await fetchConversionPaths({
             fromAsset: assetIn,
             toAsset: assetOut,
             amount: parsedAmount,
@@ -127,7 +135,7 @@ export default function CrossAssetPayment() {
         throw new Error('Cross-asset contract ID is unavailable.');
       }
 
-      const result = await submitCrossAssetPayment({
+      const result: { txHash: string } = await submitCrossAssetPayment({
         contractId,
         sourceAddress: address,
         signTransaction: sign,

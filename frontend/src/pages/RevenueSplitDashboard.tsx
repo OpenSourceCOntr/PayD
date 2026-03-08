@@ -1,21 +1,16 @@
-/* eslint-disable
-  @typescript-eslint/no-unsafe-assignment,
-  @typescript-eslint/no-unsafe-call,
-  @typescript-eslint/no-unsafe-member-access,
-  @typescript-eslint/no-unsafe-argument
-*/
+// RevenueSplitDashboard component
 import { useEffect, useMemo, useState } from 'react';
-import { useNotification } from '../hooks/useNotification';
-import { useWallet } from '../hooks/useWallet';
-import { useWalletSigning } from '../hooks/useWalletSigning';
-import { contractService } from '../services/contracts';
+import { useNotification } from '../hooks/useNotification.js';
+import { useWallet } from '../hooks/useWallet.js';
+import { useWalletSigning } from '../hooks/useWalletSigning.js';
+import { contractService } from '../services/contracts.js';
 import {
   fetchDistributionEvents,
   fetchRevenueSplitAllocations,
   updateRevenueAllocations,
   type DistributionEvent,
   type RevenueAllocation,
-} from '../services/revenueSplit';
+} from '../services/revenueSplit.js';
 
 const ORGANIZATION_ID = 1;
 
@@ -51,10 +46,10 @@ export default function RevenueSplitDashboard() {
   const { sign } = useWalletSigning();
   const { notifyError, notifySuccess } = useNotification();
 
-  const preferredStablecoin = (
-    localStorage.getItem('preferredStablecoin') ||
-    import.meta.env.VITE_PREFERRED_STABLECOIN ||
-    'USDC'
+  const preferredStablecoin: string = (
+    (localStorage.getItem('preferredStablecoin') ||
+      import.meta.env.VITE_PREFERRED_STABLECOIN ||
+      'USDC') as string
   ).toUpperCase();
 
   const totalAllocation = useMemo(
@@ -75,7 +70,10 @@ export default function RevenueSplitDashboard() {
         (byRecipient.get(event.recipientLabel) || 0) + event.amount
       );
     });
-    return [...byRecipient.entries()].map(([recipient, amount]) => ({ recipient, amount }));
+    return Array.from(byRecipient.entries()).map(([recipient, amount]) => ({
+      recipient,
+      amount,
+    }));
   }, [events]);
 
   const totalDistributed = useMemo(
@@ -235,8 +233,9 @@ export default function RevenueSplitDashboard() {
               {allocations.length === 0 ? (
                 <p className="text-sm text-zinc-400">No allocation data loaded.</p>
               ) : (
-                allocations.map((entry, index) => (
-                  <p key={`${entry.recipient}-${index}`} className="text-xs text-zinc-300">
+                allocations.map((entry, idx) => (
+                  // eslint-disable-next-line react-x/no-array-index-key
+                  <p key={`${entry.recipient}-${idx}`} className="text-xs text-zinc-300">
                     {entry.recipient.slice(0, 6)}...{entry.recipient.slice(-4)} -{' '}
                     <span className="font-bold text-white">{entry.percentage.toFixed(2)}%</span>
                   </p>
@@ -264,22 +263,23 @@ export default function RevenueSplitDashboard() {
           </div>
 
           <div className="space-y-3">
-            {allocations.map((entry, index) => (
+            {allocations.map((entry, idx) => (
               <div
-                key={`${entry.recipient}-${index}`}
+                // eslint-disable-next-line react-x/no-array-index-key
+                key={`${entry.recipient}-${idx}`}
                 className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center"
               >
                 <input
                   type="text"
                   value={entry.recipient}
-                  onChange={(event) => setAllocationField(index, 'recipient', event.target.value)}
+                  onChange={(event) => setAllocationField(idx, 'recipient', event.target.value)}
                   placeholder="Recipient Stellar Address"
                   className="md:col-span-8 bg-[#0a0a0c] border border-zinc-800 rounded-lg px-3 py-2 text-xs"
                 />
                 <input
                   type="number"
                   value={Number.isFinite(entry.percentage) ? entry.percentage : 0}
-                  onChange={(event) => setAllocationField(index, 'percentage', event.target.value)}
+                  onChange={(event) => setAllocationField(idx, 'percentage', event.target.value)}
                   min={0}
                   max={100}
                   step={0.01}
@@ -288,7 +288,7 @@ export default function RevenueSplitDashboard() {
                 />
                 <button
                   type="button"
-                  onClick={() => removeRecipient(index)}
+                  onClick={() => removeRecipient(idx)}
                   className="md:col-span-1 text-red-400 text-xs font-semibold"
                 >
                   Remove

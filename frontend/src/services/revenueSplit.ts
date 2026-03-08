@@ -1,10 +1,3 @@
-/* eslint-disable
-  @typescript-eslint/no-unsafe-assignment,
-  @typescript-eslint/no-unsafe-call,
-  @typescript-eslint/no-unsafe-member-access,
-  @typescript-eslint/no-unsafe-argument,
-  @typescript-eslint/no-base-to-string
-*/
 import {
   BASE_FEE,
   Contract,
@@ -17,8 +10,7 @@ import {
 } from '@stellar/stellar-sdk';
 import { simulateTransaction } from './transactionSimulation';
 
-const API_BASE_URL =
-  (import.meta.env.VITE_API_URL as string | undefined) || 'http://localhost:3000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 const DEFAULT_RPC_URL =
   (import.meta.env.PUBLIC_STELLAR_RPC_URL as string | undefined) ||
   'https://soroban-testnet.stellar.org';
@@ -67,11 +59,11 @@ function normalizeAllocationsFromNative(nativeValue: unknown): RevenueAllocation
   if (!Array.isArray(nativeValue)) return [];
 
   return nativeValue
-    .map((entry) => {
+    .map((entry: unknown) => {
       if (Array.isArray(entry)) {
-        const [recipient, percentageRaw] = entry;
+        const [recipient, percentageRaw] = entry as [unknown, unknown];
         return {
-          recipient: String(recipient || ''),
+          recipient: typeof recipient === 'string' ? recipient : '',
           percentage: toNumber(percentageRaw),
         };
       }
@@ -79,7 +71,12 @@ function normalizeAllocationsFromNative(nativeValue: unknown): RevenueAllocation
       if (entry && typeof entry === 'object') {
         const item = entry as Record<string, unknown>;
         return {
-          recipient: String(item.recipient ?? item.address ?? ''),
+          recipient:
+            typeof item.recipient === 'string'
+              ? item.recipient
+              : typeof item.address === 'string'
+                ? item.address
+                : '',
           percentage: toNumber(item.percentage ?? item.weight ?? item.share),
         };
       }
@@ -136,7 +133,7 @@ export async function fetchRevenueSplitAllocations(
   }
 
   const retval = xdr.ScVal.fromXDR(payload.result.retval, 'base64');
-  const nativeValue = scValToNative(retval);
+  const nativeValue: unknown = scValToNative(retval);
   return normalizeAllocationsFromNative(nativeValue);
 }
 
@@ -199,15 +196,15 @@ export async function fetchDistributionEvents(
     data: Array<Record<string, unknown>>;
   };
 
-  return (payload.data || []).map((event) => ({
+  return (payload.data || []).map((event: Record<string, unknown>) => ({
     id: Number(event.id ?? 0),
-    createdAt: String(event.created_at ?? ''),
-    txHash: (event.tx_hash as string | null) ?? null,
+    createdAt: typeof event.created_at === 'string' ? event.created_at : '',
+    txHash: typeof event.tx_hash === 'string' ? event.tx_hash : null,
     amount: toNumber(event.amount),
-    assetCode: String(event.asset_code ?? 'USDC'),
-    action: String(event.action ?? 'unknown'),
+    assetCode: typeof event.asset_code === 'string' ? event.asset_code : 'USDC',
+    action: typeof event.action === 'string' ? event.action : 'unknown',
     recipientLabel:
-      `${String(event.employee_first_name ?? '')} ${String(event.employee_last_name ?? '')}`.trim() ||
-      String(event.employee_email ?? 'Unknown recipient'),
+      `${typeof event.employee_first_name === 'string' ? event.employee_first_name : ''} ${typeof event.employee_last_name === 'string' ? event.employee_last_name : ''}`.trim() ||
+      (typeof event.employee_email === 'string' ? event.employee_email : 'Unknown recipient'),
   }));
 }

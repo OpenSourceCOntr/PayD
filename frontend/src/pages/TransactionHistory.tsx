@@ -28,8 +28,11 @@ function getStatusClass(status: string): string {
 function TimelineSkeleton() {
   return (
     <div className="space-y-3">
-      {Array.from({ length: 6 }).map((_, idx) => (
-        <div key={idx} className="animate-pulse rounded-xl border border-zinc-800 p-4">
+      {[0, 1, 2, 3, 4, 5].map((val) => (
+        <div
+          key={`skeleton-${val}`}
+          className="animate-pulse rounded-xl border border-zinc-800 p-4"
+        >
           <div className="h-3 w-40 bg-zinc-800 rounded mb-2" />
           <div className="h-3 w-64 bg-zinc-800 rounded mb-2" />
           <div className="h-3 w-28 bg-zinc-800 rounded" />
@@ -66,7 +69,7 @@ export default function TransactionHistory() {
       setIsLoading(true);
       setError(null);
       try {
-        const result = await fetchHistoryPage({
+        const result: { items: TimelineItem[]; hasMore: boolean } = await fetchHistoryPage({
           page: 1,
           limit: 20,
           filters: debouncedFilters,
@@ -94,12 +97,12 @@ export default function TransactionHistory() {
     const nextPage = page + 1;
     setIsLoadingMore(true);
     try {
-      const result = await fetchHistoryPage({
+      const result: { items: TimelineItem[]; hasMore: boolean } = await fetchHistoryPage({
         page: nextPage,
         limit: 20,
         filters: debouncedFilters,
       });
-      setItems((prev) => [...prev, ...result.items]);
+      setItems((prev: TimelineItem[]) => [...prev, ...result.items]);
       setPage(nextPage);
       setHasMore(result.hasMore);
     } catch (loadError) {
